@@ -1,0 +1,201 @@
+buildscript {
+    repositories {
+        // NOTE: You should declare only repositories that you need here
+        mavenLocal()
+        mavenCentral()
+        maven { url "http://172.16.100.98/nexus/content/groups/public/"}
+        maven { url "http://repo.spring.io/release" }
+        maven { url "http://repo.spring.io/milestone" }
+        maven { url "http://repo.spring.io/snapshot" }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.6.RELEASE")
+        classpath "org.springframework:springloaded:1.2.3.RELEASE"
+    }
+}
+
+
+
+apply plugin: "java"
+apply plugin: "idea"
+apply plugin: "maven"
+apply plugin: "eclipse-wtp"
+
+group "com.ymatou.openapi"
+version "1.0.0"
+
+jar {
+    baseName = 'openapi'
+
+    exclude('logback-test.xml')
+    exclude { it.name.endsWith('.properties'); }
+}
+
+compileJava {
+	sourceCompatibility = 1.8
+	targetCompatibility = 1.8
+	options.encoding = 'UTF-8'
+}
+
+compileTestJava {
+	sourceCompatibility = 1.8
+	targetCompatibility = 1.8
+	options.encoding = 'UTF-8'
+}
+
+ext {
+	springDataMongoVersion = "1.9.2.RELEASE"
+	springDataJpaVersion = "1.10.1.RELEASE"
+	logbackVersion = "1.1.7"
+	slf4jVersion = "1.7.21"
+	springVersion = "4.2.5.RELEASE"
+	mybatisVersion = "3.4.1"
+	mybatisSpringVersion = "1.3.0"
+	junitVersion = "4.12"
+	jmockitVersion = "1.22"
+	tomcatEmbedVersion = "8.0.33"
+	jsoupVersion = "1.9.2"
+	jasperVersion = "6.0.45"
+	druidVersion = "1.0.18"
+	jtdsVersion = "1.3.1"
+
+	httpclientVersion = "4.5.2"
+	httpcoreVersion = "4.4.4"
+
+	resteasyJaxrsVersion = "3.0.16.Final"
+	jacksonVersion = "2.7.4"
+
+	validationApiVersion = "1.1.0.Final"
+	hibernateValidatorVersion = "5.2.4.Final"
+	hibernateVersion="4.3.11.Final"
+
+	kryoVersion = "3.0.3"
+	kryoSerializersVersion = "0.37"
+
+	dubboxVersion = "2.8.4"
+	zookeeperVersion = "3.4.8"
+
+	zkclientVersion = "0.1"
+	commonsLang3Version = "3.4"
+	disconfVersion = "2.6.41"
+	commonsIoVersion = "2.4"
+
+	mongoDriverVerson = "3.2.2"
+
+	jodaTimeVerson = "2.9.3"
+
+	elApiVersion = "2.2"
+	errorreporterVersion = "1.0.9"
+	performanceMonitorClientVersion = "1.1.5"
+	messagebusVersion = "1.0.3"
+	mysqlVersion = "5.1.31"
+
+	junitToolboxVersion = "2.2"
+
+	fastjsonVersion = "1.2.28"
+	guavaVersion = "19.0"
+
+	//!-- self version --
+	ymtCommonMybatisVersion = "1.0.0"
+
+//        !--对外暴露的API，需发布到maven私服，供客户端引用。版本会不断升级。 --
+//        !--开发联调，API还未稳定，需要频繁发布时，版本号变更为1.0.0.SNAPSHOT。 --
+//        !--API最终确定后，版本号修改为“1.0.0YyyyMmDd”并release。客户端最终必须都是使用release版 --
+	openapiBizFacadeVersion = "1.0.0.2017061101"
+}
+
+repositories {
+	mavenLocal()
+	maven { url "http://172.16.100.98/nexus/content/groups/public/"}
+//        maven { url "http://repo.spring.io/release" }
+//        maven { url "http://repo.spring.io/milestone" }
+//        maven { url "http://repo.spring.io/snapshot" }
+	maven { url "http://repository.jboss.org/nexus/content/groups/public/" }
+	mavenCentral()
+}
+
+dependencies {
+	
+	compile "ch.qos.logback:logback-classic:${logbackVersion}"
+	compile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+	compile "org.slf4j:slf4j-api:${slf4jVersion}"
+	compile "com.alibaba:druid:${druidVersion}"
+	compile "org.mybatis:mybatis-spring:${mybatisSpringVersion}"
+	compile "org.mybatis:mybatis:${mybatisVersion}"
+	compile "net.sourceforge.jtds:jtds:${jtdsVersion}"
+	compile "org.springframework:spring-context:${springVersion}"
+	compile "org.springframework:spring-context-support:${springVersion}"
+	compile "org.springframework:spring-orm:${springVersion}"
+	compile "org.springframework:spring-aspects:${springVersion}"
+	compile "org.springframework.data:spring-data-jpa:${springDataJpaVersion}"
+	compile "org.hibernate:hibernate-core:${hibernateVersion}"
+	compile "org.hibernate:hibernate-entitymanager:${hibernateVersion}"
+	compile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
+	compile "mysql:mysql-connector-java:${mysqlVersion}"
+	
+	compile ("com.alibaba:dubbo:${dubboxVersion}"){
+		exclude group:"org.springframework"
+	}
+
+	compile "org.apache.tomcat.embed:tomcat-embed-core:${tomcatEmbedVersion}"
+	compile "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatEmbedVersion}"
+
+	compile "org.apache.httpcomponents:httpclient:${httpclientVersion}"
+	compile "org.apache.httpcomponents:httpcore:${httpcoreVersion}"
+
+	compile ("com.github.sgroschupf:zkclient:${zkclientVersion}"){
+		exclude group: 'org.apache.zookeeper', module: 'zookeeper'
+	}
+
+	compile "joda-time:joda-time:${jodaTimeVerson}"
+
+	compile "com.ymatou.resteasy:resteasy-jaxrs:${resteasyJaxrsVersion}"
+	compile "com.ymatou.resteasy:resteasy-client:${resteasyJaxrsVersion}"
+
+	//ymatou
+	compile "com.ymatou:performancemonitorclient:${performanceMonitorClientVersion}"
+	compile "com.ymatou.errorreporter:errorreporter-logback:${errorreporterVersion}"
+	compile "com.ymatou.disconf:disconf-client:${disconfVersion}"
+	compile "com.ymatou.common:mybatis:${ymtCommonMybatisVersion}"
+
+	compile "com.ymatou.openapi:openapi-biz-facade:${openapiBizFacadeVersion}"
+
+	testCompile "org.springframework:spring-test:${springVersion}"
+	testCompile "org.jmockit:jmockit:${jmockitVersion}"
+	testCompile "junit:junit:${junitVersion}"
+
+}
+
+//复制启动，停止脚本
+task copyScript(type: Copy) {
+    into "$buildDir/dist"
+    from "$projectDir/script"
+}
+
+//复制jar
+task copyJars(type: Copy, dependsOn: jar) {
+    from configurations.runtime  //项目所有的jar依赖
+    from "$buildDir/libs"        //本项目jar
+    into "$buildDir/dist/lib"
+}
+
+//复制配置
+task copyConfig(type: Copy) {
+    from "$projectDir/src/main/resources/disconf.properties"
+    into "$buildDir/dist/conf"
+}
+
+task copyMeta(type: Copy) {
+    from "$projectDir/src/main/resources/META-INF"
+    into "$buildDir/dist/conf/META-INF"
+}
+
+//打包发布 发布为：gradle release 默认位置为：build/distributions
+task release(type: Zip, dependsOn: [clean,copyScript, copyJars, copyConfig, copyMeta]) {
+    archiveName = "openapi.zip"
+    from "$buildDir/dist"
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "2.4"
+}

@@ -27,10 +27,13 @@ public class OpenApiResult extends BaseResponse {
     }
 
     public static OpenApiResult newFailInstance(ReturnCode returnCode, String message) {
+        if ( returnCode == null || returnCode == ReturnCode.SUCCESS) {
+            throw new IllegalArgumentException("Wrong returnCode for a failure response");
+        }
         return newInstance(returnCode.getCode(), message, false);
     }
 
-    public static OpenApiResult newInstance(String returnCode, String message, boolean success) {
+    private static OpenApiResult newInstance(String returnCode, String message, boolean success) {
         OpenApiResult result = new OpenApiResult();
         result.setCode(returnCode);
         result.setMessage(message);

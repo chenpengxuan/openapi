@@ -10,12 +10,11 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 
+import com.ymatou.openapi.model.ReturnCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -36,8 +35,9 @@ import com.ymatou.openapi.util.Utils;
  * @author luoshiqian 2017/5/12 14:40
  */
 @Component("openapiResource")
-@Path("/{api:(?i:api)}/{v1:(?i:v1)}")
+@Path("/api")
 @Produces({"application/json; charset=UTF-8"})
+@Consumes({MediaType.APPLICATION_JSON})
 @Service(protocol = "rest")
 public class OpenapiResourceImpl implements OpenapiResource {
 
@@ -46,34 +46,39 @@ public class OpenapiResourceImpl implements OpenapiResource {
     @Autowired
     private OpenapiFacade openapiFacade;
 
-    @Path("/{appId}/{method}")
+    @Path("/v1")
     @POST
     @Override
-    public OpenApiResult gateway(@PathParam("appId") String appId, @PathParam("method") String method,
-           @Context HttpServletRequest request) {
+    public OpenApiResult gateway(@QueryParam("appId") String appId, @QueryParam("method") String method,
+                                 @Context HttpServletRequest request) {
+        String body = null;
+        OpenapiReq openapiReq  = null;
 
-        OpenApiResult openApiResult = new OpenApiResult();
-        String body;
-        String requestId = Utils.uuid();
-        // log日志配有"logPrefix"占位符
-        MDC.put(Constants.LOG_PREFIX, requestId);
         try {
             body = StreamUtils.copyToString(request.getInputStream(), Charset.forName("UTF-8"));
-            OpenapiReq openapiReq = JSON.parseObject(body, OpenapiReq.class);
-            openapiReq.setRequestId(requestId);
+            openapiReq = JSON.parseObject(body, OpenapiReq.class);
+        } catch (Exception e) {
+            logger.error("Failed to parse request json body:{}", body, e);
+            return OpenApiResult.newFailInstance(ReturnCode.BIZ_PARAM_JSON_FORMAT_ERR);
+        }
+        if ( openapiReq == null ) {
+            logger.error("Receive empty json body:{}", body);
+            return OpenApiResult.newFailInstance(ReturnCode.BIZ_PARAM_JSON_FORMAT_ERR);
+        }
+        try{
+            openapiReq.setRequestId(Utils.uuid() + "_" + openapiReq.getNonceStr());
+            // log日志配有"logPrefix"占位符
+            MDC.put(Constants.LOG_PREFIX, openapiReq.getRequestId());
+
             openapiReq.setSourceIp(Utils.getRequestIp(request));
 
-            openApiResult = openapiFacade.gateway(openapiReq);
-        } catch (IOException e) {
-            // todo
-            // openApiResult.setCode(ReturnCode.);
-        } catch (JSONException e) {
-            // todo
+            return openapiFacade.gateway(openapiReq);
+
         } catch (Exception e) {
-            // todo
+            logger.error("Failed to execute method {} for app {}", method, appId, e);
+            return OpenApiResult.newFailInstance(ReturnCode.ERROR);
         } finally {
             MDC.clear();
         }
-        return openApiResult;
     }
 }

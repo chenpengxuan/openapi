@@ -95,9 +95,6 @@ public class OpenapiFacade {
         // 验证nonceStr 32位之类
         if (openapiReq.getNonceStr().length() > 32) {
             return newFailInstance(ReturnCode.INVALID_PARAM, "非法nonceStr!");
-        }else {
-            openapiReq.setRequestId(openapiReq.getRequestId() + "_" + openapiReq.getNonceStr());
-            MDC.put(Constants.LOG_PREFIX, openapiReq.getRequestId());
         }
 
         Optional<Application> applicationOptional = cacheService.findByAppId(openapiReq.getAppId());
@@ -128,9 +125,9 @@ public class OpenapiFacade {
 
             BaseResponse bizResp = openapiBizFacade.execute(bizReq);
             return newInstance(bizResp);
+        } else {
+            return newFailInstance(ReturnCode.SIGN_VERIFY_FAIL);
         }
-
-        return newFailInstance(ReturnCode.SIGN_VERIFY_FAIL);
     }
 
 

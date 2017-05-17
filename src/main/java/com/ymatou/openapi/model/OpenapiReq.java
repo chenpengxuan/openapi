@@ -19,7 +19,6 @@ public class OpenapiReq extends BaseRequest {
      * 洋码头分配的应用appId
      */
     @JSONField(name = "app_id")
-    @NotNull
     private String appId;
 
     /**

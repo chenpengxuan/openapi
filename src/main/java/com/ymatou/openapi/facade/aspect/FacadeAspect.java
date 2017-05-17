@@ -52,7 +52,7 @@ public class FacadeAspect {
 
         long startTime = System.currentTimeMillis();
 
-        logger.debug("Recv:" + req);
+        logger.info("Recv:" + req);
 
         Object resp = null;
 
@@ -68,24 +68,7 @@ public class FacadeAspect {
             resp = buildErrorResponse(joinPoint, ReturnCode.ERROR);
             logger.error("Unknown error in executing request:{}", req, e);
         } finally {
-            logger.debug("Resp:" + resp);
-
-            long costTime = System.currentTimeMillis() - startTime;
-            if (costTime > 1000) {
-                logger.warn("slow publish gt 1000ms({}ms). Req:{}", costTime, req);
-            } else if (costTime > 500) {
-                logger.warn("slow publish gt 500ms({}ms). Req:{}", costTime, req);
-            } else if (costTime > 300) {
-                logger.warn("slow publish gt 300ms({}ms). Req:{}", costTime, req);
-            } else if (costTime > 200) {
-                logger.warn("slow publish gt 200ms({}ms). Req:{}", costTime, req);
-            } else if (costTime > 100) {
-                logger.warn("slow publish gt 100ms({}ms). Req:{}", costTime, req);
-            } else if (costTime > 50) {
-                logger.warn("slow publish gt 50ms({}ms). Req:{}", costTime, req);
-            } else if (costTime > 20) {
-                logger.warn("slow publish gt 20ms({}ms). Req:{}", costTime, req);
-            }
+            logger.info("Consumed:{}ms Resp:{}", System.currentTimeMillis()-startTime, resp);
         }
 
         return resp;

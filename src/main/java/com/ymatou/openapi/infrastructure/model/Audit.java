@@ -70,7 +70,7 @@ public class Audit {
     }
 
     @PrePersist
-    public void PrePersist() {
+    public void prePersist() {
         setCreateTime(new Date());
         setUpdateTime(new Date());
         if (StringUtils.isBlank(status)) {

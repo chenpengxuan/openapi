@@ -26,6 +26,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 /**
+ * TODO:有无必要，什么形式用？
  * @author luoshiqian 2017/3/14 11:08
  */
 public class CustomExceptionMapper implements ExceptionMapper<Throwable> {
@@ -36,7 +37,7 @@ public class CustomExceptionMapper implements ExceptionMapper<Throwable> {
     public Response toResponse(Throwable exception) {
 
         HttpServletRequest request = ResteasyProviderFactory.getContextData(HttpServletRequest.class);
-        LOGGER.error("exception:{},url:{},clientIp:{},header:{}", exception.toString(), request.getRequestURL(),
+        LOGGER.warn("exception:{},url:{},clientIp:{},header:{}", exception.toString(), request.getRequestURL(),
                 getIp(request), getHeaders(request));
 
         if (exception instanceof JsonMappingException || exception instanceof JsonParseException) {

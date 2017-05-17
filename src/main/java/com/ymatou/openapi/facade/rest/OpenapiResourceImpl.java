@@ -62,7 +62,7 @@ public class OpenapiResourceImpl implements OpenapiResource {
             return OpenApiResult.newFailInstance(ReturnCode.BIZ_PARAM_JSON_FORMAT_ERR);
         }
         if ( openapiReq == null ) {
-            logger.error("Receive empty json body:{}", body);
+            logger.warn("Receive empty json body:{}", body);
             return OpenApiResult.newFailInstance(ReturnCode.BIZ_PARAM_JSON_FORMAT_ERR);
         }
         try{

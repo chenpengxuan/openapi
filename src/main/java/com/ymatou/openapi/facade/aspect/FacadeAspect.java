@@ -46,7 +46,7 @@ public class FacadeAspect {
         Logger logger = DEFAULT_LOGGER;
 
         if (req == null) {
-            logger.error("{} Recv: null", joinPoint.getSignature());
+            logger.warn("{} Recv: null", joinPoint.getSignature());
             return buildErrorResponse(joinPoint, ReturnCode.ERROR);
         }
 
@@ -62,7 +62,7 @@ public class FacadeAspect {
         } catch (IllegalArgumentException e) {
             // 无效参数异常
             resp = buildErrorResponse(joinPoint, ReturnCode.INVALID_PARAM);
-            logger.error("Invalid request: {}", req, e);
+            logger.warn("Invalid request: {}", req, e);
         } catch (Throwable e) {
             // 未知异常
             resp = buildErrorResponse(joinPoint, ReturnCode.ERROR);

@@ -84,7 +84,7 @@ public class OpenapiFacade {
         try {
             requestTime = DateTime.parse(openapiReq.getTimestamp(), FORMATTER_YYYYMMDDHHMMSS);
         } catch (Exception e) {
-            logger.error("requestTime format error:{}", openapiReq);
+            logger.warn("requestTime format error:{}", openapiReq);
             return newFailInstance(ReturnCode.INVALID_PARAM, "timestamp 格式不正确!");
         }
 
@@ -152,7 +152,7 @@ public class OpenapiFacade {
         if (openapiReq.getSign().equals(serverSign)) {
             return true;
         } else {
-            logger.error("signVerify fail, req:{},serverSign:{}", openapiReq, serverSign);
+            logger.warn("signVerify fail, req:{},serverSign:{}", openapiReq, serverSign);
             return false;
         }
     }

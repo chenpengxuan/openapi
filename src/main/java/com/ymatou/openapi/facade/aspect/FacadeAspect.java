@@ -7,7 +7,6 @@
 package com.ymatou.openapi.facade.aspect;
 
 
-import com.ymatou.openapi.biz.facade.model.ResultCode;
 import com.ymatou.openapi.model.BaseRequest;
 import com.ymatou.openapi.model.BaseResponse;
 import com.ymatou.openapi.model.ReturnCode;
@@ -18,10 +17,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
-
-import com.ymatou.openapi.constants.Constants;
 
 
 /**
@@ -65,7 +61,7 @@ public class FacadeAspect {
             resp = joinPoint.proceed(new Object[] {req});
         } catch (IllegalArgumentException e) {
             // 无效参数异常
-            resp = buildErrorResponse(joinPoint, ReturnCode.LACK_PARAM);
+            resp = buildErrorResponse(joinPoint, ReturnCode.INVALID_PARAM);
             logger.error("Invalid request: {}", req, e);
         } catch (Throwable e) {
             // 未知异常

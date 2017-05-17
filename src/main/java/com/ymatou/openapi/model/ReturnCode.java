@@ -16,7 +16,7 @@ public enum ReturnCode {
 
     SUCCESS("0000", "成功"),
 
-    LACK_PARAM("0001", "缺少必填参数"),
+    INVALID_PARAM("0001", "缺少必填参数"),
 
     INVALID_AUTH_CODE("0002", "非法授权码"),
 

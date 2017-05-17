@@ -58,26 +58,26 @@ public class OpenapiFacade {
 
         // 验证appid存在
         if (StringUtils.isBlank(openapiReq.getAppId())) {
-            return newFailInstance(ReturnCode.LACK_PARAM, "app_id 必填!");
+            return newFailInstance(ReturnCode.INVALID_PARAM, "app_id 必填!");
         }
         if (StringUtils.isBlank(openapiReq.getMethod())) {
-            return newFailInstance(ReturnCode.LACK_PARAM, "method 必填!");
+            return newFailInstance(ReturnCode.INVALID_PARAM, "method 必填!");
         }
         // 验证signmethod md5
         if (StringUtils.isBlank(openapiReq.getSignMethod()) && !"MD5".equals(openapiReq.getSignMethod())) {
-            return newFailInstance(ReturnCode.LACK_PARAM, "sign_method 必填传 MD5 ");
+            return newFailInstance(ReturnCode.INVALID_PARAM, "sign_method 必填传 MD5 ");
         }
         if (StringUtils.isBlank(openapiReq.getAuthCode())) {
-            return newFailInstance(ReturnCode.LACK_PARAM, "auth_code 必填!");
+            return newFailInstance(ReturnCode.INVALID_PARAM, "auth_code 必填!");
         }
         if (StringUtils.isBlank(openapiReq.getTimestamp())) {
-            return newFailInstance(ReturnCode.LACK_PARAM, "timestamp 必填!");
+            return newFailInstance(ReturnCode.INVALID_PARAM, "timestamp 必填!");
         }
         if (StringUtils.isBlank(openapiReq.getNonceStr())) {
-            return newFailInstance(ReturnCode.LACK_PARAM, "nonce_str 必填!");
+            return newFailInstance(ReturnCode.INVALID_PARAM, "nonce_str 必填!");
         }
         if (StringUtils.isBlank(openapiReq.getSign())) {
-            return newFailInstance(ReturnCode.LACK_PARAM, "sign 必填!");
+            return newFailInstance(ReturnCode.INVALID_PARAM, "sign 必填!");
         }
         // 验证timestamp 10分钟之内
         DateTime requestTime;
@@ -85,7 +85,7 @@ public class OpenapiFacade {
             requestTime = DateTime.parse(openapiReq.getTimestamp(), FORMATTER_YYYYMMDDHHMMSS);
         } catch (Exception e) {
             logger.error("requestTime format error:{}", openapiReq);
-            return newFailInstance(ReturnCode.LACK_PARAM, "timestamp 格式不正确!");
+            return newFailInstance(ReturnCode.INVALID_PARAM, "timestamp 格式不正确!");
         }
 
         if (Minutes.minutesBetween(requestTime, DateTime.now()).getMinutes() > 10) {
@@ -94,7 +94,7 @@ public class OpenapiFacade {
 
         // 验证nonceStr 32位之类
         if (openapiReq.getNonceStr().length() > 32) {
-            return newFailInstance(ReturnCode.LACK_PARAM, "非法nonceStr!");
+            return newFailInstance(ReturnCode.INVALID_PARAM, "非法nonceStr!");
         }else {
             openapiReq.setRequestId(openapiReq.getRequestId() + "_" + openapiReq.getNonceStr());
             MDC.put(Constants.LOG_PREFIX, openapiReq.getRequestId());

@@ -88,7 +88,8 @@ public class OpenapiFacade {
             return newFailInstance(ReturnCode.INVALID_PARAM, "timestamp 格式不正确!");
         }
 
-        if (Minutes.minutesBetween(requestTime, DateTime.now()).getMinutes() > 10) {
+        int diffMinutes = Minutes.minutesBetween(requestTime, DateTime.now()).getMinutes();
+        if (diffMinutes > 10 || diffMinutes < -10) {
             return newFailInstance(ReturnCode.INVALID_REQ_TIME);
         }
 

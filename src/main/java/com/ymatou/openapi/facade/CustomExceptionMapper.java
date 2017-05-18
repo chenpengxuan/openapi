@@ -11,10 +11,16 @@ import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
+import com.alibaba.fastjson.JSONException;
 import org.apache.commons.lang3.StringUtils;
+import org.jboss.resteasy.resteasy_jaxrs.i18n.LogMessages;
+import org.jboss.resteasy.spi.Failure;
+import org.jboss.resteasy.spi.NoLogWebApplicationException;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,19 +45,36 @@ public class CustomExceptionMapper implements ExceptionMapper<Throwable> {
         HttpServletRequest request = ResteasyProviderFactory.getContextData(HttpServletRequest.class);
         LOGGER.warn("exception:{},url:{},clientIp:{},header:{}", exception.toString(), request.getRequestURL(),
                 getIp(request), getHeaders(request));
-
-        if (exception instanceof JsonMappingException || exception instanceof JsonParseException) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(exception.getMessage()).type("text/plain")
+        if (exception instanceof WebApplicationException) {
+            return handleWebApplicationException((WebApplicationException) exception);
+        } else if (exception instanceof Failure) {
+            return handleFailure((Failure) exception);
+        }else if (exception instanceof JsonMappingException || exception instanceof JsonParseException || exception instanceof JSONException) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(exception.getMessage()).type(ContentType.TEXT_PLAIN_UTF_8)
                     .build();
-        } else if (exception instanceof NotFoundException) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Oops! the requested resource is not found!")
-                    .type("text/plain").build();
-        } else {
+        }else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Internal server error: " + exception.toString()).type(ContentType.TEXT_PLAIN_UTF_8)
                     .build();
         }
+    }
 
+
+    protected Response handleFailure(Failure failure) {
+        if (failure.getResponse() != null) {
+            return failure.getResponse();
+        } else {
+            Response.ResponseBuilder builder = Response.status(failure.getErrorCode());
+            if (failure.getMessage() != null)
+                builder.type(MediaType.TEXT_HTML).entity(failure.getMessage());
+            return builder.build();
+        }
+    }
+
+    protected Response handleWebApplicationException(WebApplicationException wae) {
+        if (!(wae instanceof NoLogWebApplicationException))
+            LogMessages.LOGGER.failedToExecute(wae);
+        return wae.getResponse();
     }
 
     private String getHeaders(HttpServletRequest request) {

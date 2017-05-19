@@ -6,26 +6,7 @@
 
 package com.ymatou.openapi.facade;
 
-import static com.ymatou.openapi.constants.Constants.FORMATTER_YYYYMMDDHHMMSS;
-import static com.ymatou.openapi.model.OpenApiResult.newFailInstance;
-import static com.ymatou.openapi.model.OpenApiResult.newInstance;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.ymatou.openapi.constants.Constants;
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.Minutes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.google.common.collect.Maps;
 import com.ymatou.openapi.biz.facade.OpenapiBizFacade;
 import com.ymatou.openapi.biz.facade.req.OpenapiBizReq;
@@ -37,6 +18,23 @@ import com.ymatou.openapi.model.OpenapiReq;
 import com.ymatou.openapi.model.ReturnCode;
 import com.ymatou.openapi.service.CacheService;
 import com.ymatou.openapi.util.AesUtil;
+import com.ymatou.performancemonitorclient.PerformanceStatisticContainer;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.Minutes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import static com.ymatou.openapi.constants.Constants.FORMATTER_YYYYMMDDHHMMSS;
+import static com.ymatou.openapi.model.OpenApiResult.newFailInstance;
+import static com.ymatou.openapi.model.OpenApiResult.newInstance;
 
 /**
  * @author luoshiqian 2017/5/10 17:32
@@ -48,7 +46,7 @@ public class OpenapiFacade {
 
     @Autowired
     private CacheService cacheService;
-    @Reference
+    @Reference(retries = 1,check = false)
     private OpenapiBizFacade openapiBizFacade;
 
 
@@ -124,7 +122,9 @@ public class OpenapiFacade {
             bizReq.setRequestId(openapiReq.getRequestId());
             bizReq.setSourceIp(openapiReq.getSourceIp());
 
-            BaseResponse bizResp = openapiBizFacade.execute(bizReq);
+            BaseResponse bizResp = PerformanceStatisticContainer.addWithReturn(() -> openapiBizFacade.execute(bizReq),
+                    bizReq.getMethod());
+
             return newInstance(bizResp);
         } else {
             return newFailInstance(ReturnCode.SIGN_VERIFY_FAIL);

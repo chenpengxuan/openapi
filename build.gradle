@@ -114,6 +114,10 @@ repositories {
 	mavenCentral()
 }
 
+configurations {
+	compile.exclude group: "junit", module: "junit"
+}
+
 dependencies {
 	
 	compile "ch.qos.logback:logback-classic:${logbackVersion}"
@@ -155,10 +159,16 @@ dependencies {
 	//ymatou
 	compile "com.ymatou:performancemonitorclient:${performanceMonitorClientVersion}"
 	compile "com.ymatou.errorreporter:errorreporter-logback:${errorreporterVersion}"
-	compile "com.ymatou.disconf:disconf-client:${disconfVersion}"
+	compile ("com.ymatou.disconf:disconf-client:${disconfVersion}"){
+		exclude group: "junit", module: "junit"
+	}
 	compile "com.ymatou.common:mybatis:${ymtCommonMybatisVersion}"
 
 	compile "com.ymatou.openapi:openapi-biz-facade:${openapiBizFacadeVersion}"
+
+	compile ("com.ymatou:performancemonitorclient:${performanceMonitorClientVersion}"){
+		exclude group: "junit", module: "junit"
+	}
 
 	testCompile "org.springframework:spring-test:${springVersion}"
 	testCompile "org.jmockit:jmockit:${jmockitVersion}"

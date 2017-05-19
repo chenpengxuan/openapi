@@ -3,7 +3,7 @@
 source "/etc/profile"
 GCLOGPATH="logs/gc.log"
 DISCONF_ENV=$1
-APP_NAME="open.ymatou.com"
+APP_NAME="openapi.iapi.ymatou.com"
 MAIN_CLASS="com.ymatou.openapi.starter.Application"
 CLASS_PATH="lib/*:conf"
 JAVA_OPTS=" -server \

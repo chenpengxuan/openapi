@@ -18,7 +18,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class Constants {
 
 
-    public static final String APP_ID = "open.ymatou.com";
+    public static final String APP_ID = "openapi.iapi.ymatou.com";
     public static final String LOG_PREFIX = "logPrefix";
 
     public static ConfigurableApplicationContext ctx;

@@ -6,19 +6,12 @@
 
 package com.ymatou.openapi.facade;
 
-import com.alibaba.dubbo.config.annotation.Reference;
-import com.google.common.collect.Maps;
-import com.ymatou.openapi.biz.facade.OpenapiBizFacade;
-import com.ymatou.openapi.biz.facade.req.OpenapiBizReq;
-import com.ymatou.openapi.biz.facade.resp.BaseResponse;
-import com.ymatou.openapi.infrastructure.model.Application;
-import com.ymatou.openapi.infrastructure.model.AuthCode;
-import com.ymatou.openapi.model.OpenApiResult;
-import com.ymatou.openapi.model.OpenapiReq;
-import com.ymatou.openapi.model.ReturnCode;
-import com.ymatou.openapi.service.CacheService;
-import com.ymatou.openapi.util.AesUtil;
-import com.ymatou.performancemonitorclient.PerformanceStatisticContainer;
+import static com.ymatou.openapi.constants.Constants.FORMATTER_YYYYMMDDHHMMSS;
+import static com.ymatou.openapi.model.OpenApiResult.newFailInstance;
+import static com.ymatou.openapi.model.OpenApiResult.newInstance;
+
+import java.util.*;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
@@ -27,11 +20,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-
-import static com.ymatou.openapi.constants.Constants.FORMATTER_YYYYMMDDHHMMSS;
-import static com.ymatou.openapi.model.OpenApiResult.newFailInstance;
-import static com.ymatou.openapi.model.OpenApiResult.newInstance;
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.google.common.collect.Maps;
+import com.ymatou.openapi.biz.facade.OpenapiBizFacade;
+import com.ymatou.openapi.biz.facade.req.OpenapiBizReq;
+import com.ymatou.openapi.biz.facade.resp.BaseResponse;
+import com.ymatou.openapi.infrastructure.model.Application;
+import com.ymatou.openapi.infrastructure.model.AuthCode;
+import com.ymatou.openapi.infrastructure.model.StatusEnum;
+import com.ymatou.openapi.model.OpenApiResult;
+import com.ymatou.openapi.model.OpenapiReq;
+import com.ymatou.openapi.model.ReturnCode;
+import com.ymatou.openapi.service.CacheService;
+import com.ymatou.openapi.util.AesUtil;
+import com.ymatou.performancemonitorclient.PerformanceStatisticContainer;
 
 /**
  * @author luoshiqian 2017/5/10 17:32
@@ -98,6 +100,11 @@ public class OpenapiFacade {
             return newFailInstance(ReturnCode.INVALID_API_ID);
         }
 
+        Application application = applicationOptional.get();
+        if(application.getStatus().equals(StatusEnum.DISABLE.name())){
+            return newFailInstance(ReturnCode.INVALID_API_ID,"应用失效!");
+        }
+
         // 验证authCode 查询到相应sellerId
         Optional<AuthCode> authCodeOptional =
                 cacheService.findByAppIdAndAuthCode(openapiReq.getAppId(), openapiReq.getAuthCode());
@@ -105,12 +112,12 @@ public class OpenapiFacade {
             return newFailInstance(ReturnCode.INVALID_AUTH_CODE);
         }
 
-        Application application = applicationOptional.get();
+
         AuthCode authCode = authCodeOptional.get();
 
         // 验证authCode没有失效
-        if(authCode.getExpireTime().before(new Date())){
-            return newFailInstance(ReturnCode.INVALID_AUTH_CODE,"授权码过期!");
+        if (authCode.getStatus().equals(StatusEnum.DISABLE.name()) || authCode.getExpireTime().before(new Date())) {
+            return newFailInstance(ReturnCode.INVALID_AUTH_CODE,"授权码失效!");
         }
 
         // 验证sign

@@ -27,10 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static com.ymatou.openapi.constants.Constants.FORMATTER_YYYYMMDDHHMMSS;
 import static com.ymatou.openapi.model.OpenApiResult.newFailInstance;
@@ -110,6 +107,11 @@ public class OpenapiFacade {
 
         Application application = applicationOptional.get();
         AuthCode authCode = authCodeOptional.get();
+
+        // 验证authCode没有失效
+        if(authCode.getExpireTime().before(new Date())){
+            return newFailInstance(ReturnCode.INVALID_AUTH_CODE,"授权码过期!");
+        }
 
         // 验证sign
         if(verifySign(application,openapiReq)){

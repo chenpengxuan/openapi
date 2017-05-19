@@ -33,7 +33,7 @@ import com.ymatou.openapi.model.ReturnCode;
 public class OpenapiFacadeRestTest {
     private static final Logger logger = LoggerFactory.getLogger(OpenapiFacadeRestTest.class);
 
-    String url = "http://openapi.iapi.ymatou.com/api/v1?app_id=%s&method=%s";
+    String url = "http://apigateway.ymatou.com/api/v1?app_id=%s&method=%s";
 
     HttpClient httpClient = buildClient();
 

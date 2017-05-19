@@ -33,7 +33,7 @@ import com.ymatou.openapi.model.ReturnCode;
 public class OpenapiFacadeRestTest {
     private static final Logger logger = LoggerFactory.getLogger(OpenapiFacadeRestTest.class);
 
-    String url = "http://localhost:9412/api/v1/%s/%s";
+    String url = "http://localhost:9412/api/v1?app_id=%s&method=%s";
 
     HttpClient httpClient = buildClient();
 
@@ -86,4 +86,27 @@ public class OpenapiFacadeRestTest {
         return respBody;
     }
 
+
+
+    @Test
+    public void getGetOrderDetail() throws Exception {
+        String appId = "Ce0I6qRbFFl1KFW5rj";
+        String authCode = "OEshdxP9vk0PvdadZv1RvErKMT54ZFVv";
+        String appSecret = "di9P75Nu3NxlsCwJxYlfgD51tAwVfELV";
+
+        String method = "ymatou.order.detail.get";
+        String bizContent = "{\"order_id\":112531026L}";
+
+        String path = String.format(url, appId, method);
+        OpenapiReq req = OpenapiFacadeTest.createOpenApiReq(appId, authCode, appSecret, method, bizContent);
+
+        String respBody = httpRequest(path, JSON.toJSONString(req));
+
+        logger.info("respbody:{}", respBody);
+
+        OpenApiResult openApiResult = JSON.parseObject(respBody, OpenApiResult.class);
+
+        assertTrue(openApiResult.isSuccess());
+        assertEquals(ReturnCode.SUCCESS.getCode(), openApiResult.getCode());
+    }
 }

@@ -94,6 +94,7 @@ public class OpenapiFacadeTest extends BaseTest {
         req.setTimestamp(timestamp);
         req.setSignMethod("MD5");
         req.setSign(sign);
+        req.setBizContent(bizContent);
 
         return req;
     }

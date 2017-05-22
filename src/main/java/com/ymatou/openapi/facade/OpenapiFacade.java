@@ -61,7 +61,7 @@ public class OpenapiFacade {
             return newFailInstance(ReturnCode.INVALID_PARAM, "method 必填!");
         }
         // 验证signmethod md5
-        if (StringUtils.isBlank(openapiReq.getSignMethod()) && !"MD5".equals(openapiReq.getSignMethod())) {
+        if (StringUtils.isBlank(openapiReq.getSignMethod()) || !"MD5".equals(openapiReq.getSignMethod())) {
             return newFailInstance(ReturnCode.INVALID_PARAM, "sign_method 必填传 MD5 ");
         }
         if (StringUtils.isBlank(openapiReq.getAuthCode())) {

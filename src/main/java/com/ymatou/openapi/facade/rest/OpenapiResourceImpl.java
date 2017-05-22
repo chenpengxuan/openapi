@@ -6,15 +6,14 @@
 
 package com.ymatou.openapi.facade.rest;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-
+import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSON;
+import com.ymatou.openapi.constants.Constants;
+import com.ymatou.openapi.facade.OpenapiFacade;
+import com.ymatou.openapi.model.OpenApiResult;
+import com.ymatou.openapi.model.OpenapiReq;
 import com.ymatou.openapi.model.ReturnCode;
+import com.ymatou.openapi.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -22,14 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 
-import com.alibaba.dubbo.config.annotation.Service;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
-import com.ymatou.openapi.constants.Constants;
-import com.ymatou.openapi.facade.OpenapiFacade;
-import com.ymatou.openapi.model.OpenApiResult;
-import com.ymatou.openapi.model.OpenapiReq;
-import com.ymatou.openapi.util.Utils;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import java.nio.charset.Charset;
 
 /**
  * @author luoshiqian 2017/5/12 14:40
@@ -52,7 +48,7 @@ public class OpenapiResourceImpl implements OpenapiResource {
     public OpenApiResult gateway(@QueryParam("appId") String appId, @QueryParam("method") String method,
                                  @Context HttpServletRequest request) {
         String body = null;
-        OpenapiReq openapiReq  = null;
+        OpenapiReq openapiReq = null;
 
         try {
             body = StreamUtils.copyToString(request.getInputStream(), Charset.forName("UTF-8"));
@@ -61,15 +57,17 @@ public class OpenapiResourceImpl implements OpenapiResource {
             logger.error("Failed to parse request json body:{}", body, e);
             return OpenApiResult.newFailInstance(ReturnCode.BIZ_PARAM_JSON_FORMAT_ERR);
         }
-        if ( openapiReq == null ) {
+        if (openapiReq == null) {
             logger.warn("Receive empty json body:{}", body);
             return OpenApiResult.newFailInstance(ReturnCode.BIZ_PARAM_JSON_FORMAT_ERR);
         }
-        try{
+        try {
             openapiReq.setRequestId(Utils.uuid() + "_" + openapiReq.getNonceStr());
             // log日志配有"logPrefix"占位符
             MDC.put(Constants.LOG_PREFIX, openapiReq.getRequestId());
 
+            openapiReq.setAppId(appId);
+            openapiReq.setMethod(method);
             openapiReq.setSourceIp(Utils.getRequestIp(request));
 
             return openapiFacade.gateway(openapiReq);

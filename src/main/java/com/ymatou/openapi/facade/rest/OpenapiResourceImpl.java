@@ -45,7 +45,7 @@ public class OpenapiResourceImpl implements OpenapiResource {
     @Path("/v1")
     @POST
     @Override
-    public OpenApiResult gateway(@QueryParam("appId") String appId, @QueryParam("method") String method,
+    public OpenApiResult gateway(@QueryParam("app_id") String appId, @QueryParam("method") String method,
                                  @Context HttpServletRequest request) {
         String body = null;
         OpenapiReq openapiReq = null;
